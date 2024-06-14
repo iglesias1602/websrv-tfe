@@ -7,20 +7,17 @@ const users: IUser[] = [...Array(24)].map((_, index) => ({
     id: faker.datatype.uuid() as string,
     avatarUrl: mockImgAvatar(index + 1),
     name: faker.name.fullName() as string,
-    company: faker.company.name() as string,
-    isVerified: faker.datatype.boolean() as boolean,
-    status: sample(['active', 'banned']),
-    role: sample([
-        'Leader',
-        'Hr Manager',
-        'UI Designer',
-        'UX Designer',
-        'UI/UX Designer',
-        'Project Manager',
-        'Backend Developer',
-        'Full Stack Designer',
-        'Front End Developer',
-        'Full Stack Developer'
+    group: sample([
+        '1TL1',
+        '1TL2',
+        '1TM1',
+        '1TM2',
+        '2TL1',
+        '2TL2',
+        '2TM1',
+        '2TM2',
+        '3TL1',
+        '3TL2'
     ])
 }));
 

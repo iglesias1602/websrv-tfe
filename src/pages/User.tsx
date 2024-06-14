@@ -23,16 +23,12 @@ import {
 import Page from '@/components/Page';
 import Label from '@/components/Label';
 import Scrollbar from '@/components/Scrollbar';
-import SearchNotFound from '@/components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '@/components/_dashboard/user';
 import USER_LIST from '@/_mocks_/user';
 
 const TABLE_HEAD: HeaderLabel[] = [
     { id: 'name', label: 'Name', alignRight: false },
-    { id: 'company', label: 'Company', alignRight: false },
-    { id: 'role', label: 'Role', alignRight: false },
-    { id: 'isVerified', label: 'Verified', alignRight: false },
-    { id: 'status', label: 'Status', alignRight: false }
+    { id: 'group', label: 'Group', alignRight: false },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -127,11 +123,11 @@ const User = (): JSX.Element => {
     const isUserNotFound = filteredUsers.length === 0;
 
     return (
-        <Page title="User | Minimal-UI">
+        <Page title="Students | Minimal-UI">
             <Container>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
                     <Typography variant="h4" gutterBottom>
-                        User
+                        Students List
                     </Typography>
                     <Button
                         variant="contained"
@@ -139,7 +135,7 @@ const User = (): JSX.Element => {
                         to="#"
                         startIcon={<Icon icon={plusFill} />}
                     >
-                        New User
+                        New Student
                     </Button>
                 </Stack>
 
@@ -169,11 +165,8 @@ const User = (): JSX.Element => {
                                             const {
                                                 id,
                                                 name,
-                                                role,
-                                                status,
-                                                company,
+                                                group,
                                                 avatarUrl,
-                                                isVerified
                                             } = row;
                                             const isItemSelected = selected.indexOf(name) !== -1;
 
@@ -210,23 +203,7 @@ const User = (): JSX.Element => {
                                                             </Typography>
                                                         </Stack>
                                                     </TableCell>
-                                                    <TableCell align="left">{company}</TableCell>
-                                                    <TableCell align="left">{role}</TableCell>
-                                                    <TableCell align="left">
-                                                        {isVerified ? 'Yes' : 'No'}
-                                                    </TableCell>
-                                                    <TableCell align="left">
-                                                        <Label
-                                                            variant="ghost"
-                                                            color={
-                                                                (status === 'banned' && 'error') ||
-                                                                'success'
-                                                            }
-                                                        >
-                                                            {sentenceCase(status)}
-                                                        </Label>
-                                                    </TableCell>
-
+                                                    <TableCell align="left">{group}</TableCell>
                                                     <TableCell align="right">
                                                         <UserMoreMenu />
                                                     </TableCell>
@@ -243,7 +220,6 @@ const User = (): JSX.Element => {
                                     <TableBody>
                                         <TableRow>
                                             <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                                                <SearchNotFound searchQuery={filterName} />
                                             </TableCell>
                                         </TableRow>
                                     </TableBody>
@@ -263,7 +239,7 @@ const User = (): JSX.Element => {
                     />
                 </Card>
             </Container>
-        </Page>
+        </Page >
     );
 };
 

@@ -5,10 +5,7 @@ import menu2Fill from '@iconify/icons-eva/menu-2-fill';
 import { alpha, styled } from '@mui/material/styles';
 import { Box, Stack, AppBar, Toolbar, IconButton } from '@mui/material';
 import { MHidden } from '@/components/@material-extend';
-import Searchbar from './Searchbar';
 import AccountPopover from './AccountPopover';
-import LanguagePopover from './LanguagePopover';
-import NotificationsPopover from './NotificationsPopover';
 
 const DRAWER_WIDTH = 280;
 const APPBAR_MOBILE = 64;
@@ -47,12 +44,9 @@ const DashboardNavbar = (props: Props): JSX.Element => {
                     </IconButton>
                 </MHidden>
 
-                <Searchbar />
                 <Box sx={{ flexGrow: 1 }} />
 
                 <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1.5 }}>
-                    <LanguagePopover />
-                    <NotificationsPopover />
                     <AccountPopover />
                 </Stack>
             </ToolbarStyle>

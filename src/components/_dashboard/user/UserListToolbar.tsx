@@ -60,7 +60,7 @@ const UserListToolbar = (props: Props): JSX.Element => {
                 <SearchStyle
                     value={filterName}
                     onChange={onFilterName}
-                    placeholder="Search user..."
+                    placeholder="Search student..."
                     startAdornment={
                         <InputAdornment position="start">
                             <Box

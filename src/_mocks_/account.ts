@@ -2,10 +2,10 @@ import { IAccount } from '@/models';
 import Avatar from '@/assets/images/avatar_default.png';
 
 const account: IAccount = {
-    displayName: 'Jaydon Frankie',
-    email: 'demo@minimals.cc',
+    displayName: 'John Doe',
+    email: 'john.doe@gmail.com',
     photoURL: Avatar,
-    role: 'admin'
+    role: 'Professor'
 };
 
 export default account;

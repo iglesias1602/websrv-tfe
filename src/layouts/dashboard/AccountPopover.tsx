@@ -8,6 +8,8 @@ import { alpha } from '@mui/material/styles';
 import { Button, Box, Divider, MenuItem, Typography, Avatar, IconButton } from '@mui/material';
 import MenuPopover from '@/components/MenuPopover';
 import account from '@/_mocks_/account';
+import { useAuth } from '@/components/authentication/login/AuthContext';
+
 
 const MENU_OPTIONS = [
     {
@@ -28,6 +30,7 @@ const MENU_OPTIONS = [
 ];
 
 const AccountPopover = (): JSX.Element => {
+    const { logout } = useAuth();
     const anchorRef = useRef(null);
     const [open, setOpen] = useState(false);
 
@@ -103,7 +106,7 @@ const AccountPopover = (): JSX.Element => {
                 ))}
 
                 <Box sx={{ p: 2, pt: 1.5 }}>
-                    <Button fullWidth color="inherit" variant="outlined">
+                    <Button onClick={logout} fullWidth color="inherit" variant="outlined">
                         Logout
                     </Button>
                 </Box>
