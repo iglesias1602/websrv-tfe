@@ -3,6 +3,7 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useNavigate, useLocation } from 'react-router-dom';
 import supabase from '../SupabaseClient';
+import UnauthorizedPage from '@/pages/UnauthorizedPage'; // Import the unauthorized page component
 import './AuthContext.css';
 
 interface AuthContextType {
@@ -19,20 +20,61 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<any>(null);
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(true);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
-    });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        const { error, data } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user role:', error.message);
+          await supabase.auth.signOut();
+          setSession(null);
+          setIsAuthorized(false);
+        } else if (data.role !== 'professor') {
+          console.error('Access denied: Only professors can sign in');
+          await supabase.auth.signOut();
+          setSession(null);
+          setIsAuthorized(false);
+        }
+      }
+    };
+
+    fetchSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session && location.pathname === '/login') {
-        navigate('/dashboard/app');
+        const { error, data } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user role:', error.message);
+          await supabase.auth.signOut();
+          setSession(null);
+          setIsAuthorized(false);
+        } else if (data.role !== 'professor') {
+          console.error('Access denied: Only professors can sign in');
+          await supabase.auth.signOut();
+          setSession(null);
+          setIsAuthorized(false);
+        } else {
+          setIsAuthorized(true);
+          navigate('/dashboard/app');
+        }
       } else if (!session && location.pathname !== '/login') {
         navigate('/login');
       }
@@ -46,8 +88,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (error) {
       console.error('Error logging in:', error.message);
     } else {
-      setSession(data.session);
-      navigate('/dashboard/app');
+      const { session } = data;
+      const { error: roleError, data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+
+      if (roleError) {
+        console.error('Error fetching user role:', roleError.message);
+        await supabase.auth.signOut();
+        setSession(null);
+        setIsAuthorized(false);
+      } else if (profile.role !== 'professor') {
+        console.error('Access denied: Only professors can sign in');
+        await supabase.auth.signOut();
+        setSession(null);
+        setIsAuthorized(false);
+      } else {
+        setSession(session);
+        setIsAuthorized(true);
+        navigate('/dashboard/app');
+      }
     }
   };
 
@@ -85,8 +147,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             </div>
           </div>
         </>
-      ) : (
+      ) : isAuthorized ? (
         children
+      ) : (
+        <UnauthorizedPage />
       )}
     </AuthContext.Provider>
   );

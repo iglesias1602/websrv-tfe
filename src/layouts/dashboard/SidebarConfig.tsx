@@ -19,6 +19,11 @@ const sidebarConfig: NavItemConfig[] = [
         icon: getIcon(peopleFill)
     },
     {
+        title: 'labs',
+        path: '/dashboard/labs',
+        icon: getIcon(peopleFill)
+    },
+    {
         title: 'Not found',
         path: '/404',
         icon: getIcon(alertTriangleFill)

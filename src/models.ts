@@ -5,6 +5,13 @@ export interface IUser {
     group: string | undefined;
 }
 
+export interface ILab {
+    id: string;
+    filename: string;
+    isAvailable: string | undefined;
+    created_at: string;
+}
+
 export interface IPost {
     id: string;
     cover: string;
