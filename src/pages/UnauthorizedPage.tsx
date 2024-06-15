@@ -5,7 +5,6 @@ import { styled } from '@mui/material/styles';
 import { Box, Button, Typography, Container } from '@mui/material';
 import { MotionContainer, varBounceIn } from '@/components/animate';
 import Page from '@/components/Page';
-import IllustrationUnauthorizedImage from '@/assets/images/illustrations/illustration_unauthorized.svg';
 
 const RootStyle = styled(Page)(({ theme }) => ({
     display: 'flex',
@@ -29,14 +28,6 @@ const UnauthorizedPage = (): JSX.Element => {
                         <Typography sx={{ color: 'text.secondary' }}>
                             Sorry, you do not have permission to view this page. Please contact your administrator if you believe this is an error.
                         </Typography>
-
-                        <motion.div variants={varBounceIn}>
-                            <Box
-                                component="img"
-                                src={IllustrationUnauthorizedImage}
-                                sx={{ height: 260, mx: 'auto', my: { xs: 5, sm: 10 } }}
-                            />
-                        </motion.div>
 
                         <Button to="/login" size="large" variant="contained" component={RouterLink}>
                             Go to Login

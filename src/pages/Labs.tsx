@@ -23,12 +23,30 @@ import Page from '@/components/Page';
 import Scrollbar from '@/components/Scrollbar';
 import { LabListHead, LabListToolbar, LabMoreMenu } from '@/components/_dashboard/labs';
 import supabase from '@/components/authentication/SupabaseClient'; // Import Supabase client
+import NewLabModal from '@/components/_dashboard/labs/NewLabModal'; // Import the modal component
+import EditLabModal from '@/components/_dashboard/labs/EditLabModal'; // Import the EditLabModal component
 
 const TABLE_HEAD: HeaderLabel[] = [
     { id: 'filename', label: 'Filename', alignRight: false },
     { id: 'isAvailable', label: 'Availability', alignRight: false },
     { id: 'created_at', label: 'Created At', alignRight: false }, // New column for created_at
 ];
+
+const components = [
+    { name: 'Battery', imageUrl: '../src/assets/images/battery.png' },
+    { name: 'Black Cable', imageUrl: '../src/assets/images/black-cable.png' },
+    { name: 'Capacitor', imageUrl: '../src/assets/images/capacitor.png' },
+    { name: 'Potentiometer', imageUrl: '../src/assets/images/potentiometer.png' },
+    { name: 'Red Cable', imageUrl: '../src/assets/images/red-cable.png' },
+    { name: 'Red Led', imageUrl: '../src/assets/images/red-led.png' },
+    { name: 'Resistance', imageUrl: '../src/assets/images/resistance.png' },
+]; // Add your components here
+
+interface SelectedComponent {
+    name: string;
+    quantity: number;
+    imageUrl: string;
+}
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -70,25 +88,29 @@ const Labs = (): JSX.Element => {
     const [filterName, setFilterName] = useState('');
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [labs, setLabs] = useState<ILab[]>([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [editData, setEditData] = useState<any>(null);
+
+    const fetchLabs = async () => {
+        const { data, error } = await supabase
+            .from('save_files') // Replace with your actual table name
+            .select('id, filename, is_available, created_at, file');
+
+        if (error) {
+            console.error('Error fetching labs:', error);
+        } else {
+            setLabs(data.map((lab: any) => ({
+                id: lab.id,
+                filename: lab.filename,
+                isAvailable: lab.is_available ? 'Yes' : 'No',
+                created_at: lab.created_at,
+                components: lab.file?.slots || [] // Ensure components is always an array
+            })));
+        }
+    };
 
     useEffect(() => {
-        const fetchLabs = async () => {
-            const { data, error } = await supabase
-                .from('save_files') // Replace with your actual table name
-                .select('id, filename, is_available, created_at');
-
-            if (error) {
-                console.error('Error fetching labs:', error);
-            } else {
-                setLabs(data.map((lab: any) => ({
-                    id: lab.id,
-                    filename: lab.filename,
-                    isAvailable: lab.is_available ? 'Yes' : 'No',
-                    created_at: lab.created_at // Match the interface
-                })));
-            }
-        };
-
         fetchLabs();
     }, []);
 
@@ -140,6 +162,50 @@ const Labs = (): JSX.Element => {
         setFilterName(event.target.value);
     };
 
+    const handleNewLabClick = () => {
+        setModalOpen(true);
+    };
+
+    const handleModalClose = () => {
+        setModalOpen(false);
+    };
+
+    const handleModalSave = async (selectedComponents: SelectedComponent[], filename: string, isAvailable: boolean) => {
+        try {
+            const formattedData = {
+                filename,
+                slots: selectedComponents.map(component => ({
+                    itemName: component.name,
+                    quantity: component.quantity
+                })),
+                isAvailable
+            };
+
+            const { error } = await supabase
+                .from('save_files')
+                .insert([{ filename, file: formattedData, is_available: isAvailable }]);
+
+            if (error) {
+                console.error('Error inserting data:', error);
+            } else {
+                console.log('Data inserted successfully:', formattedData);
+                fetchLabs(); // Refresh the lab list after insertion
+            }
+        } catch (error) {
+            console.error('Unexpected error:', error);
+        }
+    };
+
+    const handleEditLab = (lab) => {
+        setEditData(lab);
+        setEditModalOpen(true);
+    };
+
+    const handleEditModalClose = () => {
+        setEditModalOpen(false);
+        setEditData(null);
+    };
+
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - labs.length) : 0;
 
     const filteredLabs = applySortFilter(labs, getComparator(order, orderBy), filterName);
@@ -155,8 +221,7 @@ const Labs = (): JSX.Element => {
                     </Typography>
                     <Button
                         variant="contained"
-                        component={RouterLink}
-                        to="#"
+                        onClick={handleNewLabClick}
                         startIcon={<Icon icon={plusFill} />}
                     >
                         New Lab
@@ -191,6 +256,7 @@ const Labs = (): JSX.Element => {
                                                 filename,
                                                 isAvailable,
                                                 created_at,
+                                                components, // Add this line if you're fetching components data
                                             } = row;
                                             const isItemSelected = selected.findIndex(lab => lab.filename === filename) !== -1;
 
@@ -210,9 +276,39 @@ const Labs = (): JSX.Element => {
                                                                 handleClick(event, filename)
                                                             }
                                                         />
-                                                    </TableCell><TableCell component="th" scope="row" padding="none"><Stack direction="row" alignItems="center" spacing={2}><Avatar>{filename.charAt(0)}</Avatar><Typography variant="subtitle2" noWrap>{filename}</Typography></Stack></TableCell><TableCell align="left">{isAvailable}</TableCell><TableCell align="left">{new Date(created_at).toLocaleDateString()}</TableCell> {/* Render created_at */}
+                                                    </TableCell>
+                                                    <TableCell component="th" scope="row" padding="none">
+                                                        <Stack direction="row" alignItems="center" spacing={2}>
+                                                            <Avatar>{filename.charAt(0)}</Avatar>
+                                                            <Typography variant="subtitle2" noWrap>{filename}</Typography>
+                                                        </Stack>
+                                                    </TableCell>
+                                                    <TableCell align="left">{isAvailable}</TableCell>
+                                                    <TableCell align="left">{new Date(created_at).toLocaleString()}</TableCell>
                                                     <TableCell align="right">
-                                                        <LabMoreMenu />
+                                                        <LabMoreMenu
+                                                            labId={id}
+                                                            filename={filename}
+                                                            isAvailable={isAvailable === 'Yes'}
+                                                            components={components} // Pass components data here
+                                                            onDelete={async (id: number) => {
+                                                                try {
+                                                                    const { error } = await supabase
+                                                                        .from('save_files')
+                                                                        .delete()
+                                                                        .eq('id', id);
+
+                                                                    if (error) {
+                                                                        console.error('Error deleting lab:', error);
+                                                                    } else {
+                                                                        fetchLabs(); // Refresh the lab list after deletion
+                                                                    }
+                                                                } catch (error) {
+                                                                    console.error('Unexpected error:', error);
+                                                                }
+                                                            }}
+                                                            onEdit={(lab: any) => handleEditLab(lab)}
+                                                        />
                                                     </TableCell>
                                                 </TableRow>
                                             );
@@ -247,8 +343,35 @@ const Labs = (): JSX.Element => {
                     />
                 </Card>
             </Container>
+            <NewLabModal
+                open={modalOpen}
+                onClose={handleModalClose}
+                onSave={handleModalSave}
+            />
+            {editData && (
+                <EditLabModal
+                    open={editModalOpen}
+                    onClose={handleEditModalClose}
+                    initialData={{
+                        labId: editData.id,
+                        filename: editData.filename,
+                        isAvailable: editData.isAvailable === 'Yes',
+                        components: editData.components.map((component: any) => ({
+                            name: component.itemName,
+                            quantity: component.quantity,
+                            imageUrl: getComponentImage(component.itemName)
+                        }))
+                    }}
+                    onSave={fetchLabs} // Pass fetchLabs to EditLabModal to refresh the labs list after update
+                />
+            )}
         </Page>
     );
+};
+
+const getComponentImage = (itemName: string): string => {
+    const component = components.find(c => c.name === itemName);
+    return component ? component.imageUrl : '';
 };
 
 export default Labs;

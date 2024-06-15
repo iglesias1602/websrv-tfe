@@ -23,7 +23,7 @@ const LabsList: React.FC<LabsListProps> = ({ setSelectedFile }) => {
     useEffect(() => {
         const fetchFiles = async () => {
             const { data, error } = await supabase
-                .from('games') // Replace with your actual table name
+                .from('save_files') // Replace with your actual table name
                 .select('filename'); // Assuming the column name is 'filename'
 
             if (error) {

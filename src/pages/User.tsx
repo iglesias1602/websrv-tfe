@@ -229,7 +229,7 @@ const User = (): JSX.Element => {
                     </Scrollbar>
 
                     <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
+                        rowsPerPageOptions={[10, 25]}
                         component="div"
                         count={USER_LIST.length}
                         rowsPerPage={rowsPerPage}

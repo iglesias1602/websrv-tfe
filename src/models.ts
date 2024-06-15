@@ -10,6 +10,7 @@ export interface ILab {
     filename: string;
     isAvailable: string | undefined;
     created_at: string;
+    components?: { name: string; quantity: number; imageUrl: string; }[];
 }
 
 export interface IPost {

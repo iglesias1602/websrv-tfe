@@ -5,8 +5,18 @@ import { Link as RouterLink } from 'react-router-dom';
 import trash2Outline from '@iconify/icons-eva/trash-2-outline';
 import moreVerticalFill from '@iconify/icons-eva/more-vertical-fill';
 import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
+import { ILab } from '@/models'; // Import the ILab interface
 
-const LabMoreMenu = (): JSX.Element => {
+interface LabMoreMenuProps {
+    labId: number;
+    filename: string;
+    isAvailable: boolean;
+    components: { name: string; quantity: number; imageUrl: string; }[];
+    onDelete: (id: number) => void;
+    onEdit: (lab: ILab) => void;
+}
+
+const LabMoreMenu = ({ labId, filename, isAvailable, components, onDelete, onEdit }: LabMoreMenuProps): JSX.Element => {
     const ref = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -26,14 +36,34 @@ const LabMoreMenu = (): JSX.Element => {
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
-                <MenuItem sx={{ color: 'text.secondary' }}>
+                <MenuItem
+                    sx={{ color: 'text.secondary' }}
+                    onClick={() => {
+                        setIsOpen(false);
+                        onDelete(labId);
+                    }}
+                >
                     <ListItemIcon>
                         <Icon icon={trash2Outline} width={24} height={24} />
                     </ListItemIcon>
                     <ListItemText primary="Delete" primaryTypographyProps={{ variant: 'body2' }} />
                 </MenuItem>
 
-                <MenuItem component={RouterLink} to="#" sx={{ color: 'text.secondary' }}>
+                <MenuItem
+                    component={RouterLink}
+                    to="#"
+                    sx={{ color: 'text.secondary' }}
+                    onClick={() => {
+                        setIsOpen(false);
+                        onEdit({
+                            id: labId.toString(),
+                            filename,
+                            isAvailable: isAvailable ? 'Yes' : 'No', // Convert boolean to string,
+                            components,
+                            created_at: ''
+                        }); // Adjust as needed
+                    }}
+                >
                     <ListItemIcon>
                         <Icon icon={editFill} width={24} height={24} />
                     </ListItemIcon>
