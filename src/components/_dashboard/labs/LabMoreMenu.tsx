@@ -4,7 +4,7 @@ import editFill from '@iconify/icons-eva/edit-fill';
 import { Link as RouterLink } from 'react-router-dom';
 import trash2Outline from '@iconify/icons-eva/trash-2-outline';
 import moreVerticalFill from '@iconify/icons-eva/more-vertical-fill';
-import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { ILab } from '@/models'; // Import the ILab interface
 
 interface LabMoreMenuProps {
@@ -19,6 +19,17 @@ interface LabMoreMenuProps {
 const LabMoreMenu = ({ labId, filename, isAvailable, components, onDelete, onEdit }: LabMoreMenuProps): JSX.Element => {
     const ref = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const handleDeleteClick = () => {
+        setIsOpen(false);
+        setIsDialogOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        onDelete(labId);
+        setIsDialogOpen(false);
+    };
 
     return (
         <>
@@ -38,10 +49,7 @@ const LabMoreMenu = ({ labId, filename, isAvailable, components, onDelete, onEdi
             >
                 <MenuItem
                     sx={{ color: 'text.secondary' }}
-                    onClick={() => {
-                        setIsOpen(false);
-                        onDelete(labId);
-                    }}
+                    onClick={handleDeleteClick}
                 >
                     <ListItemIcon>
                         <Icon icon={trash2Outline} width={24} height={24} />
@@ -58,7 +66,7 @@ const LabMoreMenu = ({ labId, filename, isAvailable, components, onDelete, onEdi
                         onEdit({
                             id: labId.toString(),
                             filename,
-                            isAvailable: isAvailable ? 'Yes' : 'No', // Convert boolean to string,
+                            isAvailable: isAvailable ? 'Yes' : 'No', // Convert boolean to string
                             components,
                             created_at: ''
                         }); // Adjust as needed
@@ -70,6 +78,28 @@ const LabMoreMenu = ({ labId, filename, isAvailable, components, onDelete, onEdi
                     <ListItemText primary="Edit" primaryTypographyProps={{ variant: 'body2' }} />
                 </MenuItem>
             </Menu>
+
+            <Dialog
+                open={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to delete this file?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsDialogOpen(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };
