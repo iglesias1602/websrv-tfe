@@ -105,15 +105,24 @@ const EditLabModal: React.FC<EditLabModalProps> = ({ open, onClose, initialData,
                 quantity: component.quantity
             }));
 
+            // Log only the slots array
+            console.log(JSON.stringify({ slots }, null, 2));
+
+            // Send the complete data to the server
             const { error } = await supabase
                 .from('save_files')
-                .update({ file: { slots } })
+                .update({
+                    filename,
+                    is_available: isAvailable,
+                    file: { slots },
+                    modified_at: new Date()
+                })
                 .eq('id', initialData.labId);
 
             if (error) {
                 console.error('Error updating data:', error);
             } else {
-                console.log('Data updated successfully:', slots);
+                console.log('Data updated successfully');
                 onSave(); // Call onSave to refresh the labs list
                 onClose(); // Close the modal after successful update
             }

@@ -68,7 +68,8 @@ const LabMoreMenu = ({ labId, filename, isAvailable, components, onDelete, onEdi
                             filename,
                             isAvailable: isAvailable ? 'Yes' : 'No', // Convert boolean to string
                             components,
-                            created_at: ''
+                            created_at: '',
+                            modified_at: ''
                         }); // Adjust as needed
                     }}
                 >

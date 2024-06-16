@@ -18,6 +18,7 @@ import {
     FormControlLabel,
     Checkbox
 } from '@mui/material';
+import supabase from '@/components/authentication/SupabaseClient';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import BatteryImage from '@/assets/images/battery.png';
 import BlackCableImage from '@/assets/images/black-cable.png';
@@ -46,7 +47,7 @@ interface SelectedComponent {
 interface NewLabModalProps {
     open: boolean;
     onClose: () => void;
-    onSave: (slots: { itemName: string; quantity: number; }[]) => void;
+    onSave: () => void;
 }
 
 const NewLabModal: React.FC<NewLabModalProps> = ({ open, onClose, onSave }) => {
@@ -80,15 +81,39 @@ const NewLabModal: React.FC<NewLabModalProps> = ({ open, onClose, onSave }) => {
         setSelectedComponents(selectedComponents.filter((component) => component.name !== name));
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const slots = selectedComponents.map(component => ({
             itemName: component.name,
             quantity: component.quantity
         }));
+        const completeData = {
+            filename,
+            isAvailable,
+            slots
+        };
         console.log(JSON.stringify({ slots }, null, 2));
-        onSave(slots);
-        onSave(slots);
-        onClose();
+
+        try {
+            const { error } = await supabase
+                .from('save_files')
+                .insert([{
+                    filename,
+                    is_available: isAvailable,
+                    file: { slots },
+                    created_at: new Date(), // Set the created_at timestamp
+                    modified_at: null // Initialize modified_at as null
+                }]);
+
+            if (error) {
+                console.error('Error inserting data:', error);
+            } else {
+                console.log('Data inserted successfully:', completeData);
+                onSave(); // Call onSave with slots
+                onClose();
+            }
+        } catch (error) {
+            console.error('Unexpected error:', error);
+        }
     };
 
     return (

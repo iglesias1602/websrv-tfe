@@ -10,6 +10,7 @@ export interface ILab {
     filename: string;
     isAvailable: string | undefined;
     created_at: string;
+    modified_at: string;
     components?: { name: string; quantity: number; imageUrl: string; }[];
 }
 

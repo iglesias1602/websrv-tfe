@@ -37,6 +37,7 @@ const TABLE_HEAD: HeaderLabel[] = [
     { id: 'filename', label: 'Filename', alignRight: false },
     { id: 'isAvailable', label: 'Availability', alignRight: false },
     { id: 'created_at', label: 'Created At', alignRight: false }, // New column for created_at
+    { id: 'modified_at', label: 'Modified At', alignRight: false }, // New column for modified_at
 ];
 
 const components = [
@@ -102,7 +103,7 @@ const Labs = (): JSX.Element => {
     const fetchLabs = async () => {
         const { data, error } = await supabase
             .from('save_files') // Replace with your actual table name
-            .select('id, filename, is_available, created_at, file');
+            .select('id, filename, is_available, created_at, modified_at, file');
 
         if (error) {
             console.error('Error fetching labs:', error);
@@ -112,6 +113,7 @@ const Labs = (): JSX.Element => {
                 filename: lab.filename,
                 isAvailable: lab.is_available ? 'Yes' : 'No',
                 created_at: lab.created_at,
+                modified_at: lab.modified_at || '-',
                 components: lab.file?.slots || [] // Ensure components is always an array
             })));
         }
@@ -177,30 +179,8 @@ const Labs = (): JSX.Element => {
         setModalOpen(false);
     };
 
-    const handleModalSave = async (selectedComponents: SelectedComponent[], filename: string, isAvailable: boolean) => {
-        try {
-            const formattedData = {
-                filename,
-                slots: selectedComponents.map(component => ({
-                    itemName: component.name,
-                    quantity: component.quantity
-                })),
-                isAvailable
-            };
-
-            const { error } = await supabase
-                .from('save_files')
-                .insert([{ filename, file: formattedData, is_available: isAvailable }]);
-
-            if (error) {
-                console.error('Error inserting data:', error);
-            } else {
-                console.log('Data inserted successfully:', formattedData);
-                fetchLabs(); // Refresh the lab list after insertion
-            }
-        } catch (error) {
-            console.error('Unexpected error:', error);
-        }
+    const handleModalSave = () => {
+        fetchLabs(); // Refresh the lab list after insertion
     };
 
     const handleEditLab = (lab) => {
@@ -263,6 +243,7 @@ const Labs = (): JSX.Element => {
                                                 filename,
                                                 isAvailable,
                                                 created_at,
+                                                modified_at,
                                                 components, // Add this line if you're fetching components data
                                             } = row;
                                             const isItemSelected = selected.findIndex(lab => lab.filename === filename) !== -1;
@@ -292,7 +273,7 @@ const Labs = (): JSX.Element => {
                                                     </TableCell>
                                                     <TableCell align="left">{isAvailable}</TableCell>
                                                     <TableCell align="left">{new Date(created_at).toLocaleString()}</TableCell>
-                                                    <TableCell align="right">
+                                                    <TableCell align="left">{modified_at !== '-' ? new Date(modified_at).toLocaleString() : '-'}</TableCell>                                                    <TableCell align="right">
                                                         <LabMoreMenu
                                                             labId={id}
                                                             filename={filename}
