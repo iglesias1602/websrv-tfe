@@ -46,7 +46,7 @@ interface SelectedComponent {
 interface NewLabModalProps {
     open: boolean;
     onClose: () => void;
-    onSave: (selectedComponents: SelectedComponent[], filename: string, isAvailable: boolean) => void;
+    onSave: (slots: { itemName: string; quantity: number; }[]) => void;
 }
 
 const NewLabModal: React.FC<NewLabModalProps> = ({ open, onClose, onSave }) => {
@@ -81,16 +81,13 @@ const NewLabModal: React.FC<NewLabModalProps> = ({ open, onClose, onSave }) => {
     };
 
     const handleSave = () => {
-        const formattedData = {
-            filename,
-            slots: selectedComponents.map(component => ({
-                itemName: component.name,
-                quantity: component.quantity
-            })),
-            isAvailable
-        };
-        console.log(JSON.stringify(formattedData, null, 2));
-        onSave(selectedComponents, filename, isAvailable);
+        const slots = selectedComponents.map(component => ({
+            itemName: component.name,
+            quantity: component.quantity
+        }));
+        console.log(JSON.stringify({ slots }, null, 2));
+        onSave(slots);
+        onSave(slots);
         onClose();
     };
 
