@@ -19,15 +19,22 @@ import {
     Checkbox
 } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
+import BatteryImage from '@/assets/images/battery.png';
+import BlackCableImage from '@/assets/images/black-cable.png';
+import CapacitorImage from '@/assets/images/capacitor.png';
+import PotentiometerImage from '@/assets/images/potentiometer.png';
+import RedCableImage from '@/assets/images/red-cable.png';
+import RedLedImage from '@/assets/images/red-led.png';
+import ResistanceImage from '@/assets/images/resistance.png';
 
 const components = [
-    { name: 'Battery', imageUrl: '../src/assets/images/battery.png' },
-    { name: 'Black Cable', imageUrl: '../src/assets/images/black-cable.png' },
-    { name: 'Capacitor', imageUrl: '../src/assets/images/capacitor.png' },
-    { name: 'Potentiometer', imageUrl: '../src/assets/images/potentiometer.png' },
-    { name: 'Red Cable', imageUrl: '../src/assets/images/red-cable.png' },
-    { name: 'Red Led', imageUrl: '../src/assets/images/red-led.png' },
-    { name: 'Resistance', imageUrl: '../src/assets/images/resistance.png' },
+    { name: 'Battery', imageUrl: BatteryImage },
+    { name: 'Black Cable', imageUrl: BlackCableImage },
+    { name: 'Capacitor', imageUrl: CapacitorImage },
+    { name: 'Potentiometer', imageUrl: PotentiometerImage },
+    { name: 'Red Cable', imageUrl: RedCableImage },
+    { name: 'Red Led', imageUrl: RedLedImage },
+    { name: 'Resistance', imageUrl: ResistanceImage },
 ]; // Add your components here
 
 interface SelectedComponent {
